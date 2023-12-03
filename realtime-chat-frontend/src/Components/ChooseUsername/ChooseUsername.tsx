@@ -1,6 +1,6 @@
 import { ChangeEvent, KeyboardEvent, useState } from 'react';
 
-import { useChatContext } from '../../contexts/ChatContext';
+import { useChatContext } from '../../Contexts/ChatContext';
 
 function ChooseUsername() {
   const [userName, setUserName] = useState('');

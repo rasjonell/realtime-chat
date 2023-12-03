@@ -1,6 +1,6 @@
 import { ChangeEvent, KeyboardEvent, useState } from 'react';
 
-import { useChatContext } from '../../contexts/ChatContext';
+import { useChatContext } from '../../Contexts/ChatContext';
 
 function ChatInput() {
   const { sendMessage } = useChatContext();
@@ -22,7 +22,7 @@ function ChatInput() {
   };
 
   return (
-    <div className="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
+    <div className="flex flex-row items-center h-16 rounded-xl bg-gray-700 w-full px-4">
       <div className="flex-grow">
         <div className="relative w-full">
           <input
@@ -30,7 +30,7 @@ function ChatInput() {
             value={message}
             onKeyDown={handleKeyPress}
             onChange={handleMessageChange}
-            className="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
+            className="flex w-full border border-gray-500 rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10 bg-gray-600"
           />
         </div>
       </div>

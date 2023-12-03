@@ -2,19 +2,19 @@ import ChatInfo from '../ChatInfo';
 import ChatInput from '../ChatInput';
 import ChatMessage from '../ChatMessage';
 import ChooseUsername from '../ChooseUsername';
-import { useChatContext } from '../../contexts/ChatContext';
+import { useChatContext } from '../../Contexts/ChatContext';
 
 function ChatRoom() {
   const { userName, isConnected, messages } = useChatContext();
 
   return isConnected ? (
-    <div className="flex h-screen antialiased text-gray-800">
+    <div className="flex h-screen antialiased text-white bg-gray-900">
       <div className="w-0 invisible md:visible md:w-64">
         <ChatInfo />
       </div>
       <div className="flex flex-row h-full w-full overflow-x-hidden">
         <div className="flex flex-col flex-auto h-full p-6">
-          <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4">
+          <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-800 h-full p-4">
             <div className="flex flex-col h-full overflow-x-auto mb-4">
               <div className="flex flex-col h-full">
                 {messages.length ? (
