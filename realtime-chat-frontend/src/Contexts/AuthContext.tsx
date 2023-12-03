@@ -35,37 +35,40 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useLocalStorage<AuthResult | null>('user', null);
 
   const login = async (username: string, password: string): Promise<void> => {
+    setError(null);
     setIsLoading(true);
 
     const data = await fetchData<AuthResult>('login', { username, password });
 
     if (data.ok) {
       setUser(data.result);
+      navigate('/');
     } else {
       setError(data.error.message);
     }
 
     setIsLoading(false);
-    navigate('/');
   };
 
   const signup = async (username: string, password: string): Promise<void> => {
+    setError(null);
     setIsLoading(true);
 
     const data = await fetchData<AuthResult>('signup', { username, password });
 
     if (data.ok) {
       setUser(data.result);
+      navigate('/');
     } else {
       setError(data.error.message);
     }
 
     setIsLoading(false);
-    navigate('/');
   };
 
   const logout = () => {
     setUser(null);
+    setError(null);
     navigate('/login');
   };
 
@@ -78,7 +81,7 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
       signup,
       isLoading,
     }),
-    [user],
+    [user, error, isLoading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
