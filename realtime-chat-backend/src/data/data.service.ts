@@ -1,4 +1,3 @@
-import { WsException } from '@nestjs/websockets';
 import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
@@ -16,22 +15,26 @@ export class DataService {
     return this.#messages;
   }
 
-  addUser(userName: string): RealtimeChat.UserData[] {
+  addUser(id: string, userName: string): RealtimeChat.UserData {
     const userData = { userName };
-    this.#users.set(userName, userData);
+    this.#users.set(id, userData);
     this.logger.log(`User Added: ${userData}`);
-    return this.users;
+    return userData;
   }
 
-  removeUser(userName: string): RealtimeChat.UserData[] {
-    const existingUser = this.#users.get(userName);
+  getUser(id: string): RealtimeChat.UserData | undefined {
+    return this.#users.get(id);
+  }
+
+  removeUser(id: string): RealtimeChat.UserData {
+    const existingUser = this.#users.get(id);
     if (!existingUser) {
-      throw new WsException(`Disconnected User Does Not Exist: ${userName}`);
+      console.warn('Disconnecting user that does not exist');
     }
 
     this.logger.log(`User Removed: ${existingUser}`);
-    this.#users.delete(userName);
-    return this.users;
+    this.#users.delete(id);
+    return existingUser;
   }
 
   addMessage(message: RealtimeChat.Message): RealtimeChat.Message[] {
