@@ -10,4 +10,9 @@ declare module RealtimeChat {
     message: string;
     createdAt: Date;
   };
+
+  type NewcomerData = {
+    users: UserData[];
+    messages: Message[];
+  };
 }

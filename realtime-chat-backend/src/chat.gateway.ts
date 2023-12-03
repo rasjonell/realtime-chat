@@ -34,7 +34,7 @@ export class ChatGateway
     @MessageBody() data: string,
     @ConnectedSocket() socket: Socket,
   ): void {
-    this.logger.log(`new msg, ${data}`);
+    this.logger.log(`[addNewMessage], ${data}`);
     const newMessage = this.chatService.handleMessageToServer(data, socket);
     this.server.emit('message', newMessage);
   }
@@ -46,8 +46,14 @@ export class ChatGateway
   ): void {
     this.logger.log('[join]', data);
     const user = this.chatService.handleNewUserJoin(socket.id, data);
+    const newcomerData = this.chatService.retrieveNewConnectionData(socket.id);
 
-    this.server.emit('usersChanged', { user, event: 'joined' });
+    if (user) {
+      this.server.sockets.sockets.get(socket.id).emit('joined', newcomerData);
+      this.server.emit('usersChanged', { user, event: 'joined' });
+    } else {
+      this.server.sockets.sockets.get(socket.id).emit('userExists');
+    }
   }
 
   afterInit(_server: Server) {

@@ -15,10 +15,14 @@ export class DataService {
     return this.#messages;
   }
 
-  addUser(id: string, userName: string): RealtimeChat.UserData {
+  addUser(id: string, userName: string): RealtimeChat.UserData | null {
+    if ([...this.#users.values()].find((user) => user.userName === userName)) {
+      return null;
+    }
+
     const userData = { userName };
     this.#users.set(id, userData);
-    this.logger.log(`User Added: ${userData}`);
+    this.logger.log(`User Added: ${userName}`);
     return userData;
   }
 
@@ -26,10 +30,11 @@ export class DataService {
     return this.#users.get(id);
   }
 
-  removeUser(id: string): RealtimeChat.UserData {
+  removeUser(id: string): RealtimeChat.UserData | null {
     const existingUser = this.#users.get(id);
     if (!existingUser) {
       console.warn('Disconnecting user that does not exist');
+      return null;
     }
 
     this.logger.log(`User Removed: ${existingUser}`);

@@ -9,7 +9,10 @@ export class ChatService {
 
   constructor(private readonly dataService: DataService) {}
 
-  handleNewUserJoin(id: string, userName: string): RealtimeChat.UserData {
+  handleNewUserJoin(
+    id: string,
+    userName: string,
+  ): RealtimeChat.UserData | null {
     return this.dataService.addUser(id, userName.trim());
   }
 
@@ -21,7 +24,15 @@ export class ChatService {
     return message;
   }
 
-  handleDisconnect(id: string): RealtimeChat.UserData {
+  retrieveNewConnectionData(id: string): RealtimeChat.NewcomerData {
+    const messages = this.dataService.messages;
+    const users = this.dataService.users.filter(
+      (user) => user.userName !== this.dataService.getUser(id)?.userName,
+    );
+    return { users, messages };
+  }
+
+  handleDisconnect(id: string): RealtimeChat.UserData | null {
     return this.dataService.removeUser(id);
   }
 
