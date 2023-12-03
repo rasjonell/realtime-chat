@@ -1,8 +1,8 @@
 import { Socket } from 'socket.io';
-import { Injectable, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { DataService } from 'src/data/data.service';
+import { DataService } from '../data/data.service';
 
 @Injectable()
 export class UsersService {

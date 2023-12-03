@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
+import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class DataService {
