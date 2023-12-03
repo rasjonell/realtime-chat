@@ -64,7 +64,10 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   const sendMessage = (message: string): void => {
-    socket.emit('addNewMessage', message);
+    const filtered = message.trim();
+    if (filtered) {
+      socket.emit('addNewMessage', filtered);
+    }
   };
 
   const onConnect = (): void => {
@@ -96,8 +99,8 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   const onJoined = (data: NewcomerData): void => {
-    setUsers((prev) => [...prev, ...data.users]);
-    setMessages((prev) => [...prev, ...data.messages]);
+    setUsers(data.users);
+    setMessages(data.messages);
   };
 
   const onConnectionEstablished = (): void => {
