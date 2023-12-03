@@ -16,7 +16,7 @@ import { DataService } from './data/data.service';
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: 'http://localhost:5173',
   },
 })
 export class ChatGateway
@@ -27,18 +27,27 @@ export class ChatGateway
 
   private logger = new Logger('ChatGateway');
 
-  constructor(
-    private readonly chatService: ChatService,
-    private readonly dataService: DataService,
-  ) {}
+  constructor(private readonly chatService: ChatService) {}
 
-  @SubscribeMessage('messageToserver')
+  @SubscribeMessage('addNewMessage')
   handleMessage(
     @MessageBody() data: string,
     @ConnectedSocket() socket: Socket,
   ): void {
+    this.logger.log(`new msg, ${data}`);
     const newMessage = this.chatService.handleMessageToServer(data, socket);
-    this.server.emit('messageFromServer', newMessage);
+    this.server.emit('message', newMessage);
+  }
+
+  @SubscribeMessage('join')
+  handleJoin(
+    @MessageBody() data: string,
+    @ConnectedSocket() socket: Socket,
+  ): void {
+    this.logger.log('[join]', data);
+    const user = this.chatService.handleNewUserJoin(socket.id, data);
+
+    this.server.emit('usersChanged', { user, event: 'joined' });
   }
 
   afterInit(_server: Server) {
@@ -47,20 +56,12 @@ export class ChatGateway
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
-    const updatedUsers = this.chatService.handleDisconnect(client);
+    const user = this.chatService.handleDisconnect(client.id);
 
-    this.server.emit('users', updatedUsers);
+    this.server.emit('usersChanged', { user, event: 'left' });
   }
 
   handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
-    const updatedUsers = this.chatService.handleConnect(client);
-
-    client.send('connected', {
-      users: updatedUsers,
-      messages: this.dataService.messages,
-    });
-
-    this.server.emit('users', updatedUsers);
   }
 }
