@@ -1,10 +1,9 @@
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react';
+import { PropsWithChildren, createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { socket } from '../socket';
 
 export type User = {
   userName: string;
-  avatarURL: string;
 };
 
 export type Message = {
