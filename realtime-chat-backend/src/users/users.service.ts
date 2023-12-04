@@ -1,3 +1,7 @@
+/**
+ * UsersModule and Service are responsible for User registration
+ * and retrieval. Chat members and users are separate entities.
+ */
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

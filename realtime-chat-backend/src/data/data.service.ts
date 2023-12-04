@@ -1,3 +1,9 @@
+/*
+ * DataModule and Service are an abstraction over the
+ * Data Access Layer. If we decide to have a database,
+ * we can change the internals of this service, without
+ * refactoring the services depending on it.
+ */
 import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()

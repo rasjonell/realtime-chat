@@ -1,3 +1,7 @@
+/**
+ * Chat Gateway is a WebSocketGateway. It is responsible for
+ * setting up WS events, authorization, and exception handling.
+ */
 import {
   MessageBody,
   OnGatewayInit,
@@ -12,7 +16,6 @@ import { Socket, Server } from 'socket.io';
 import { Logger, UseFilters, UseGuards } from '@nestjs/common';
 
 import { ChatService } from './chat.service';
-import { DataService } from './data/data.service';
 import { AuthGuard } from './auth/auth.guard';
 import { WebsocketExceptionsFilter } from './ws-exception.filter';
 

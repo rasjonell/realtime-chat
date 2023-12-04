@@ -1,3 +1,7 @@
+/**
+ * Auth Controller is responsible for the REST
+ * endpoints for sign-in and sign-up functionality.
+ */
 import { Body, Post, HttpCode, Controller, HttpStatus } from '@nestjs/common';
 
 import { AuthService } from './auth.service';

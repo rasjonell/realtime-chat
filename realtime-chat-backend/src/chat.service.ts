@@ -1,3 +1,6 @@
+/**
+ * Chat Service is responsible for handling WS Events.
+ */
 import { Injectable, Logger } from '@nestjs/common';
 
 import { DataService } from './data/data.service';
