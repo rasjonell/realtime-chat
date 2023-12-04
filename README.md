@@ -15,6 +15,7 @@ git clone https://github.com/rasjonell/realtime-chat.git && cd realtime-chat
 - Backend
 
   ```bash
+  cd realtime-chat-backend
   npm install
   npm run build && npm run start:prod
   ```
@@ -22,6 +23,7 @@ git clone https://github.com/rasjonell/realtime-chat.git && cd realtime-chat
 - Frontend
 
   ```bash
+  cd realtime-chat-frontend
   npm install
   npm run build && npm run preview -- --port 5173 --open
   ```
