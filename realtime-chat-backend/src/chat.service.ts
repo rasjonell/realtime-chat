@@ -1,4 +1,3 @@
-import { Socket } from 'socket.io';
 import { Injectable, Logger } from '@nestjs/common';
 
 import { DataService } from './data/data.service';
@@ -11,14 +10,14 @@ export class ChatService {
 
   handleNewUserJoin(
     id: string,
-    userName: string,
+    username: string,
   ): RealtimeChat.UserData | null {
-    return this.dataService.addUser(id, userName.trim());
+    return this.dataService.addUser(id, username.trim());
   }
 
-  handleMessageToServer(data: string, socket: Socket): RealtimeChat.Message {
+  handleMessageToServer(data: string, username: string): RealtimeChat.Message {
     this.logger.log(`New Message ${data}`);
-    const message = this.formatMessage(socket, data);
+    const message = this.formatMessage(username, data);
 
     this.dataService.addMessage(message);
     return message;
@@ -27,8 +26,9 @@ export class ChatService {
   retrieveNewConnectionData(id: string): RealtimeChat.NewcomerData {
     const messages = this.dataService.messages;
     const users = this.dataService.users.filter(
-      (user) => user.userName !== this.dataService.getUser(id)?.userName,
+      (user) => user.username !== this.dataService.getUser(id)?.username,
     );
+
     return { users, messages };
   }
 
@@ -36,13 +36,11 @@ export class ChatService {
     return this.dataService.removeUser(id);
   }
 
-  formatMessage(socket: Socket, data: string): RealtimeChat.Message {
-    const user = this.dataService.getUser(socket.id);
-
+  formatMessage(username: string, data: string): RealtimeChat.Message {
     return {
+      author: username,
       message: data.trim(),
       createdAt: new Date(),
-      author: user.userName,
     };
   }
 }

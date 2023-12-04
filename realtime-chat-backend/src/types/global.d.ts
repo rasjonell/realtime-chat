@@ -1,13 +1,13 @@
 declare module RealtimeChat {
   type UserData = {
-    userName: string;
+    username: string;
   };
 
   type User = Map<string, UserData>;
 
   type AuthUser = {
     id: number;
-    userName: string;
+    username: string;
     password: string;
   };
 

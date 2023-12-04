@@ -8,11 +8,13 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
+import { Logger, UseFilters, UseGuards } from '@nestjs/common';
 
 import { ChatService } from './chat.service';
 import { DataService } from './data/data.service';
+import { AuthGuard } from './auth/auth.guard';
+import { WebsocketExceptionsFilter } from './ws-exception.filter';
 
 @WebSocketGateway({
   cors: {
@@ -29,30 +31,34 @@ export class ChatGateway
 
   constructor(private readonly chatService: ChatService) {}
 
+  @UseGuards(AuthGuard)
+  @UseFilters(new WebsocketExceptionsFilter())
   @SubscribeMessage('addNewMessage')
   handleMessage(
-    @MessageBody() data: string,
     @ConnectedSocket() socket: Socket,
+    @MessageBody('text') text: string,
+    @MessageBody('username') username: string,
   ): void {
-    this.logger.log(`[addNewMessage], ${data}`);
-    const newMessage = this.chatService.handleMessageToServer(data, socket);
+    this.logger.log(`[addNewMessage] ${text}`);
+    const newMessage = this.chatService.handleMessageToServer(text, username);
     this.server.emit('message', newMessage);
   }
 
+  @UseGuards(AuthGuard)
+  @UseFilters(new WebsocketExceptionsFilter())
   @SubscribeMessage('join')
   handleJoin(
-    @MessageBody() data: string,
     @ConnectedSocket() socket: Socket,
+    @MessageBody('username') username: string,
   ): void {
-    this.logger.log('[join]', data);
-    const user = this.chatService.handleNewUserJoin(socket.id, data);
+    const user = this.chatService.handleNewUserJoin(socket.id, username);
     const newcomerData = this.chatService.retrieveNewConnectionData(socket.id);
 
-    if (user) {
+    if (!user) {
+      this.logger.log('Already existing user trying to join');
+    } else {
       this.server.sockets.sockets.get(socket.id).emit('joined', newcomerData);
       this.server.emit('usersChanged', { user, event: 'joined' });
-    } else {
-      this.server.sockets.sockets.get(socket.id).emit('userExists');
     }
   }
 

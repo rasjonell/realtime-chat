@@ -15,14 +15,14 @@ export class DataService {
     return this.#messages;
   }
 
-  addUser(id: string, userName: string): RealtimeChat.UserData | null {
-    if ([...this.#users.values()].find((user) => user.userName === userName)) {
+  addUser(id: string, username: string): RealtimeChat.UserData | null {
+    if ([...this.#users.values()].find((user) => user.username === username)) {
       return null;
     }
 
-    const userData = { userName };
+    const userData = { username };
     this.#users.set(id, userData);
-    this.logger.log(`User Added: ${userName}`);
+    this.logger.log(`User Added: ${username}`);
     return userData;
   }
 
@@ -37,14 +37,14 @@ export class DataService {
       return null;
     }
 
-    this.logger.log(`User Removed: ${existingUser}`);
+    this.logger.log(`User Removed: ${existingUser.username}`);
     this.#users.delete(id);
     return existingUser;
   }
 
   addMessage(message: RealtimeChat.Message): RealtimeChat.Message[] {
     this.#messages.push(message);
-    this.logger.log(`Message Added ${message}]`);
+    this.logger.log(`Message Added ${message.message}]`);
     return this.#messages;
   }
 }

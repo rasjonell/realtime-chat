@@ -14,27 +14,33 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-  signIn(userName: string, password: string): { accessToken: string } {
-    const user = this.usersService.findOne(userName);
+  signIn(
+    username: string,
+    password: string,
+  ): { username: string; accessToken: string } {
+    const user = this.usersService.findOne(username);
 
     if (user?.password !== password) {
       throw new UnauthorizedException('Incorrect credentials');
     }
 
-    const payload = { sub: user.id, userName: user.userName };
+    const payload = { sub: user.id, username: user.username };
 
-    return { accessToken: this.jwtService.sign(payload) };
+    return { username, accessToken: this.jwtService.sign(payload) };
   }
 
-  singUp(userName: string, password: string): { accessToken: string } {
-    const user = this.usersService.findOne(userName);
+  singUp(
+    username: string,
+    password: string,
+  ): { username: string; accessToken: string } {
+    const user = this.usersService.findOne(username);
     if (user) {
       throw new BadRequestException('Username already exists');
     }
 
-    const newUser = this.usersService.create(userName, password);
-    const payload = { sub: newUser.id, userName: newUser.userName };
+    const newUser = this.usersService.create(username, password);
+    const payload = { sub: newUser.id, username: newUser.username };
 
-    return { accessToken: this.jwtService.sign(payload) };
+    return { username, accessToken: this.jwtService.sign(payload) };
   }
 }
