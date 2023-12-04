@@ -1,10 +1,14 @@
+/**
+ * Chat Context is responsible for holding global state
+ * for the ongoing chat. It also sets up WS Connection and event handlers.
+ */
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import type { Socket } from 'socket.io-client';
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react';
 
 import { initateSocket } from '../socket';
 import { useAuthContext } from './AuthContext';
-import toast from 'react-hot-toast';
 
 export type User = {
   username: string;

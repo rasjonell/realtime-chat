@@ -1,9 +1,13 @@
+/**
+ * Auth Context is responsible for holding global
+ * authentication state, it uses localStorage to persist users.
+ */
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { PropsWithChildren, createContext, useContext, useMemo, useState } from 'react';
 
 import { fetchData } from './helpers/api';
 import useLocalStorage from '../Hooks/useLocalStorage';
-import toast from 'react-hot-toast';
 
 type AuthResult = {
   username: string;

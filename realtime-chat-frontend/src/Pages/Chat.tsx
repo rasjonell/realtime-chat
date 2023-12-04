@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 import Loading from '../Components/Loading';
 import ChatRoom from '../Components/ChatRoom';
-
 import { useAuthContext } from '../Contexts/AuthContext';
 import { useChatContext } from '../Contexts/ChatContext';
 

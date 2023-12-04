@@ -1,3 +1,7 @@
+/**
+ * Socket.io singleton. Since we only open the connection for
+ * authenticated users, we disable `autoConnect`.
+ */
 import { io, type Socket } from 'socket.io-client';
 
 const URL = 'http://localhost:3000';
