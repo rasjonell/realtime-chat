@@ -21,7 +21,7 @@ import { WebsocketExceptionsFilter } from './ws-exception.filter';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:5173',
+    origin: '*',
   },
 })
 export class ChatGateway
