@@ -1,7 +1,20 @@
-import { io } from 'socket.io-client';
+import { io, type Socket } from 'socket.io-client';
 
-const URL = import.meta.env.DEV ? 'http://localhost:3000' : import.meta.env.VITE_WS_HOST;
+const URL = 'http://localhost:3000';
 
-export const socket = io(URL, {
-  autoConnect: false,
-});
+let initiatedSocket: Socket | null = null;
+
+export const initateSocket = (token: string) => {
+  if (initiatedSocket) {
+    return initiatedSocket;
+  }
+
+  initiatedSocket = io(URL, {
+    autoConnect: false,
+    extraHeaders: {
+      Authorization: 'Bearer ' + token,
+    },
+  });
+
+  return initiatedSocket;
+};

@@ -1,9 +1,13 @@
-import { PropsWithChildren, createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import type { Socket } from 'socket.io-client';
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react';
 
-import { socket } from '../socket';
+import { initateSocket } from '../socket';
+import { useAuthContext } from './AuthContext';
+import toast from 'react-hot-toast';
 
 export type User = {
-  userName: string;
+  username: string;
 };
 
 export type Message = {
@@ -11,6 +15,8 @@ export type Message = {
   message: string;
   createdAt: string;
 };
+
+type NewMessageResponse = string | Message;
 
 type NewcomerData = {
   users: User[];
@@ -29,71 +35,92 @@ type UsersChangedEventData =
 
 type ChatContextData = {
   users: User[];
-  userName: string;
-  joinError: boolean;
+  join: () => void;
   messages: Message[];
   isConnected: boolean;
-  join: (userName: string) => void;
+  disconnect: () => void;
   sendMessage: (message: string) => void;
 };
 
 export const ChatContext = createContext<ChatContextData>({
   users: [],
-  userName: '',
   messages: [],
   join: () => {},
-  joinError: false,
   isConnected: false,
+  disconnect: () => {},
   sendMessage: () => {},
 });
 
 export const ChatContextProvider = ({ children }: PropsWithChildren) => {
-  const [userName, setUserName] = useState('');
+  const navigate = useNavigate();
+  const { user, logout } = useAuthContext();
   const [users, setUsers] = useState<User[]>([]);
-  const [joinError, setJoinError] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   const [isConnected, setIsConnected] = useState(false);
 
-  const join = (newUserName: string) => {
-    setUserName(newUserName);
-    socket.connect();
-    setJoinError(false);
-    socket.emit('join', newUserName);
+  const join = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    if (isConnected) {
+      return;
+    }
+
+    const newSocket = initateSocket(user.accessToken);
+
+    newSocket.connect();
+    setSocket(newSocket);
+    newSocket.emit('join', { username: user.username });
   };
 
   const sendMessage = (message: string): void => {
+    if (!(user && socket)) {
+      navigate('/login');
+      return;
+    }
+
     const filtered = message.trim();
     if (filtered) {
-      socket.emit('addNewMessage', filtered);
+      socket.emit('addNewMessage', { text: filtered });
     }
   };
 
   const onConnect = (): void => {
-    console.info('onConnect');
+    setIsConnected(true);
   };
 
   const onDisconnect = (): void => {
-    setUserName('');
-    setJoinError(false);
+    setUsers([]);
     setIsConnected(false);
   };
 
-  const onMessageFromServer = (data: Message): void => {
-    setMessages((prev) => [...prev, data]);
+  const disconnect = () => {
+    socket?.disconnect();
+    onDisconnect();
   };
 
-  const onUserExists = () => {
-    setJoinError(true);
-    setIsConnected(false);
+  const onMessageFromServer = (data: NewMessageResponse): void => {
+    if (typeof data === 'string') {
+      // Unathorized Error Interceptor sends error messages as string
+      toast.error(data);
+      logout();
+      navigate('/login');
+      return;
+    } else {
+      setMessages((prev) => [...prev, data]);
+    }
   };
 
   const onUsersChanged = (data: UsersChangedEventData): void => {
-    // show toast
     if (data.event === 'joined') {
       setUsers((prev) => [...prev, data.user]);
     } else if (data.user) {
-      setUsers((prev) => prev.filter((user) => user.userName !== data.user?.userName));
+      toast(`${data.user.username} Left The Chat`);
+      setUsers((prev) => prev.filter((user) => user.username !== data.user?.username));
     }
   };
 
@@ -107,31 +134,37 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   useEffect(() => {
-    if (!joinError && users.find((user) => user.userName === userName)) {
-      setIsConnected(true);
+    if (!socket) {
+      return;
     }
-  }, [userName, users, joinError]);
+
+    if (!user) {
+      disconnect();
+    }
+  }, [user]);
 
   useEffect(() => {
-    // WS Connection Events
+    if (!socket) {
+      return;
+    }
+
+    // WS event handler
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
 
-    // RealTime Chat Events
+    // Realtime Chat Event Handlers
     socket.on('joined', onJoined);
-    socket.on('userExists', onUserExists);
     socket.on('usersChanged', onUsersChanged);
     socket.on('message', onMessageFromServer);
     socket.on('connected', onConnectionEstablished);
 
     return () => {
-      // WS Connection Events
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-
-      // RealTime Chat Events
+      // WS Event Handlers
+      socket.off('conect', onConnect);
       socket.off('joined', onJoined);
-      socket.off('userExists', onUserExists);
+
+      // Realtime Chat Event Handlers
+      socket.off('disconnect', onDisconnect);
       socket.off('usersChanged', onUsersChanged);
       socket.off('message', onMessageFromServer);
       socket.off('connected', onConnectionEstablished);
@@ -139,9 +172,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
   }, [socket]);
 
   return (
-    <ChatContext.Provider
-      value={{ join, sendMessage, joinError, userName, users, messages, isConnected }}
-    >
+    <ChatContext.Provider value={{ join, sendMessage, users, messages, isConnected, disconnect }}>
       {children}
     </ChatContext.Provider>
   );

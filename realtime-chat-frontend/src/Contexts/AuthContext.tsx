@@ -3,24 +3,23 @@ import { PropsWithChildren, createContext, useContext, useMemo, useState } from 
 
 import { fetchData } from './helpers/api';
 import useLocalStorage from '../Hooks/useLocalStorage';
-
-type AuthContextData = {
-  isLoading: boolean;
-  logout: () => void;
-  error: string | null;
-  user: null | { username: string };
-  login: (username: string, password: string) => void;
-  signup: (username: string, password: string) => void;
-};
+import toast from 'react-hot-toast';
 
 type AuthResult = {
   username: string;
   accessToken: string;
 };
 
+type AuthContextData = {
+  isLoading: boolean;
+  logout: () => void;
+  user: AuthResult | null;
+  login: (username: string, password: string) => void;
+  signup: (username: string, password: string) => void;
+};
+
 export const AuthContext = createContext<AuthContextData>({
   user: null,
-  error: null,
   isLoading: false,
 
   login: () => {},
@@ -31,11 +30,9 @@ export const AuthContext = createContext<AuthContextData>({
 export const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useLocalStorage<AuthResult | null>('user', null);
 
   const login = async (username: string, password: string): Promise<void> => {
-    setError(null);
     setIsLoading(true);
 
     const data = await fetchData<AuthResult>('login', { username, password });
@@ -44,14 +41,13 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
       setUser(data.result);
       navigate('/');
     } else {
-      setError(data.error.message);
+      toast.error(data.error.message);
     }
 
     setIsLoading(false);
   };
 
   const signup = async (username: string, password: string): Promise<void> => {
-    setError(null);
     setIsLoading(true);
 
     const data = await fetchData<AuthResult>('signup', { username, password });
@@ -60,7 +56,7 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
       setUser(data.result);
       navigate('/');
     } else {
-      setError(data.error.message);
+      toast.error(data.error.message);
     }
 
     setIsLoading(false);
@@ -68,20 +64,18 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
 
   const logout = () => {
     setUser(null);
-    setError(null);
     navigate('/login');
   };
 
   const value = useMemo(
     () => ({
       user,
-      error,
       login,
       logout,
       signup,
       isLoading,
     }),
-    [user, error, isLoading],
+    [user, isLoading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

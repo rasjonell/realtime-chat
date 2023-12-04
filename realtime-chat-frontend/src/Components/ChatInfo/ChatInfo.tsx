@@ -1,10 +1,21 @@
+import { Navigate } from 'react-router-dom';
+
 import Avatar from '../Avatar';
 import { useChatContext } from '../../Contexts/ChatContext';
 import { useAuthContext } from '../../Contexts/AuthContext';
 
 function ChatInfo() {
-  const { logout } = useAuthContext();
-  const { userName, users } = useChatContext();
+  const { user, logout } = useAuthContext();
+  const { users, disconnect } = useChatContext();
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  const handleSignOut = () => {
+    disconnect();
+    logout();
+  };
 
   return (
     <div className="flex flex-col py-8 pl-6 pr-2 w-64 bg-gray-900 flex-shrink-0 text-white">
@@ -13,11 +24,14 @@ function ChatInfo() {
       </div>
       <div className="flex flex-col items-center bg-gray-700 border border-gray-600 mt-4 w-full py-6 px-4 rounded-lg">
         <div className="h-20 w-20 rounded-full border overflow-hidden">
-          <Avatar userName={userName} />
+          <Avatar username={user.username} />
         </div>
         <div className="flex items-center mt-2">
-          <div className="text-sm font-semibold">{userName}</div>
-          <button onClick={logout} className="ml-2 bg-blue-500 hover:bg-blue-600 p-1 rounded-full">
+          <div className="text-sm font-semibold">{user.username}</div>
+          <button
+            onClick={handleSignOut}
+            className="ml-2 bg-blue-500 hover:bg-blue-600 p-1 rounded-full"
+          >
             <svg
               fill="none"
               aria-hidden="true"
@@ -44,16 +58,16 @@ function ChatInfo() {
           </span>
         </div>
         <div className="flex flex-col space-y-1 mt-4 -mx-2 h-48 overflow-y-auto">
-          {users.map((user) => (
+          {users.map((chatUser) => (
             <div
-              key={user.userName}
+              key={chatUser.username}
               className="flex flex-row items-center hover:bg-gray-700 rounded-xl p-2"
             >
               <div className="flex items-center justify-center h-8 w-8 rounded-full">
-                <Avatar userName={user.userName} />
+                <Avatar username={chatUser.username} />
               </div>
-              <div className="ml-2 text-sm font-semibold">{user.userName}</div>
-              {user.userName === userName ? (
+              <div className="ml-2 text-sm font-semibold">{chatUser.username}</div>
+              {chatUser.username === user.username ? (
                 <div className="flex items-center justify-center ml-auto text-xs text-white bg-red-500 h-8 w-8 rounded leading-none">
                   You
                 </div>

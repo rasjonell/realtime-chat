@@ -1,5 +1,4 @@
-const HOST_URL =
-  (import.meta.env.DEV ? 'http://localhost:3000' : import.meta.env.VITE_HOST) + '/auth';
+const HOST_URL = 'http://localhost:3000/auth';
 
 type ErrorResponse = {
   error: string;

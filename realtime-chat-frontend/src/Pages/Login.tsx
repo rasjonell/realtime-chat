@@ -2,7 +2,7 @@ import { ChangeEvent, useState } from 'react';
 import { useAuthContext } from '../Contexts/AuthContext';
 
 function LoginPage() {
-  const { error, login, signup, isLoading } = useAuthContext();
+  const { login, signup, isLoading } = useAuthContext();
   const [action, setAction] = useState<'signin' | 'signup'>('signin');
   const [authData, setAuthData] = useState({ username: '', password: '' });
 
@@ -65,7 +65,6 @@ function LoginPage() {
                 />
               </div>
               <div>
-                {error ? <p className="text-red-500 text-center mb-2">{error}</p> : null}
                 <button
                   disabled={disabled}
                   onClick={handleSubmit}

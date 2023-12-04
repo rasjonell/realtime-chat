@@ -1,13 +1,20 @@
+import { Navigate } from 'react-router-dom';
+
 import ChatInfo from '../ChatInfo';
 import ChatInput from '../ChatInput';
 import ChatMessage from '../ChatMessage';
-import ChooseUsername from '../ChooseUsername';
 import { useChatContext } from '../../Contexts/ChatContext';
+import { useAuthContext } from '../../Contexts/AuthContext';
 
 function ChatRoom() {
-  const { userName, isConnected, messages } = useChatContext();
+  const { user } = useAuthContext();
+  const { messages } = useChatContext();
 
-  return isConnected ? (
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  return (
     <div className="flex h-screen antialiased text-white bg-gray-900">
       <div className="w-0 invisible md:visible md:w-64">
         <ChatInfo />
@@ -23,7 +30,7 @@ function ChatRoom() {
                       <ChatMessage
                         message={message}
                         key={message.createdAt}
-                        isOwn={message.author === userName}
+                        isOwn={message.author === user.username}
                       />
                     ))}
                     <div className="col-start-1 col-end-8 p-3 rounded-lg"></div>
@@ -38,8 +45,6 @@ function ChatRoom() {
         </div>
       </div>
     </div>
-  ) : (
-    <ChooseUsername />
   );
 }
 

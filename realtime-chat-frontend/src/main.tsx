@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 import App from './App.tsx';
 import { AuthContextProvider } from './Contexts/AuthContext.tsx';
-import { ChatContextProvider } from './contexts/ChatContext.tsx';
+import { ChatContextProvider } from './Contexts/ChatContext.tsx';
 
 import './index.css';
 

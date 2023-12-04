@@ -1,13 +1,13 @@
 type Props = {
-  userName: string;
+  username: string;
 };
 
-function Avatar({ userName }: Props) {
+function Avatar({ username }: Props) {
   return (
     <img
-      alt={userName}
+      alt={username}
       className="h-full w-full"
-      src={`https://api.multiavatar.com/${userName}.png?apikey=exrhKFOop3YHsa`}
+      src={`https://api.multiavatar.com/${username}.png?apikey=exrhKFOop3YHsa`}
     />
   );
 }
